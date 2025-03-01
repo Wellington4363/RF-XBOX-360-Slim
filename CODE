@@ -17,7 +17,7 @@
         13 = BOTÃO SINC  N/TP
 */
 
-#define sync_pin 11 //botão power usado como botão sync (pin 13 do modulo rf ) // para attiny85 usar sync_pin 2
+#define sync_pin 2 //botão power usado como botão sync (pin 13 do modulo rf ) // para attiny85 usar sync_pin 2
 #define data_pin 6  //linha de data (pin 4 do modulo rf) // para attiny85 usar data_pin 1
 #define clock_pin 7 //linha de clock (pin 6 do modulo rf)   // para attiny85 usar clock_pin 0
 
