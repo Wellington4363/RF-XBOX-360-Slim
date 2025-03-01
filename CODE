@@ -1,0 +1,90 @@
+/* PROJETO PARA UTILIZAR O MÓDULO RF DO XBOX 360 SLIM NO PC , COM UM MICROCONTROLADOR ATTINY85 OU ARDUINO UNO 
+   PARA SABER MAIS VISITE https://www.youtube.com/@WelTech 
+
+   WELLINGTON WTECH BRASIL
+
+   MÓDULO ALIMENTADO POR UM REGULADOR AMS1117 DE 3.3V 
+
+         2 4 6 8 10 12   CONECTOR DO 
+        1 3 5 7 9 11 13   MÓDULO RF 
+  
+         4 = DATA        TP 29
+         6 = CLOCK       TP 30
+         9 = GND         TP  9
+        10 = D-          TP 33
+        11 = 3.3V        TP 18
+        12 = D+          TP 34
+        13 = BOTÃO SINC  N/TP
+*/
+
+#define sync_pin 11 //botão power usado como botão sync (pin 13 do modulo rf ) // para attiny85 usar sync_pin 2
+#define data_pin 6  //linha de data (pin 4 do modulo rf) // para attiny85 usar data_pin 1
+#define clock_pin 7 //linha de clock (pin 6 do modulo rf)   // para attiny85 usar clock_pin 0
+
+volatile boolean sync_enable = 0;
+
+int led_cmd[11] =  {0,0,0,1,0,0,0,0,1,0,0}; 
+int anim_cmd[11] = {0,0,0,1,0,0,0,0,1,0,1}; 
+int sync_cmd[11] = {0,0,0,0,0,0,0,0,1,0,0}; 
+int led_vde_1[11] = {0,0,0,1,0,1,0,0,0,0,1};
+int led_vde_2[11] = {0,0,0,1,0,1,0,0,0,1,0};
+int led_vde_3[11] = {0,0,0,1,0,1,0,0,1,0,0};
+int led_vde_4[11] = {0,0,0,1,0,1,0,1,0,0,0};
+int led_vde_1_2[11] = {0,0,0,1,0,1,0,0,0,1,1};
+int led_vde_1_2_3[11] = {0,0,0,1,0,1,0,0,1,1,1};
+int led_vde_1_2_3_4[11] = {0,0,0,1,0,1,0,1,1,1,1};
+int led_vde_0[11] = {0,0,0,1,0,1,0,0,0,0,0};
+int CLEAR_ERROR[11] = {0,0,0,1,1,0,0,0,0,0,0};
+int OFF_CTRL[11] = {0,0,0,0,0,0,0,1,0,0,1};
+
+
+void setup() 
+{
+  pinMode(sync_pin, INPUT_PULLUP);
+  digitalWrite(sync_pin,HIGH);
+  pinMode(data_pin, INPUT);
+  pinMode(clock_pin, INPUT);
+  delay(2000);
+  initLEDs();
+}
+
+void sendData(int cmd_do[]) 
+{
+  pinMode(data_pin, OUTPUT);
+  digitalWrite(data_pin, LOW);    //começa a enviar dados.
+  int prev = 1;
+  for(int i = 0; i < 11; i++)
+  {
+    while (prev == digitalRead(clock_pin)){}   //detecta mudança no clock
+    prev = digitalRead(clock_pin);             // deve estar após a borda descida do clock, então envie um pouco de dados agora
+      
+    digitalWrite(data_pin, cmd_do[i]);
+
+    while (prev == digitalRead(clock_pin)){}   //detecta a borda subida do clock
+    prev = digitalRead(clock_pin);
+  }
+    digitalWrite(data_pin, HIGH);
+}
+
+void initLEDs()
+{
+  sendData(led_cmd);
+  delay(50);
+  sendData(anim_cmd);
+  delay(50);
+  sendData(CLEAR_ERROR);
+  delay(50);
+}
+
+void loop()
+{ 
+   sync_enable = !digitalRead(sync_pin);
+
+        if(sync_enable==1)
+        {
+         sendData(sync_cmd);
+         sync_enable = 0;
+         delay(10000);
+         digitalWrite(sync_pin,HIGH);      
+        }
+}
