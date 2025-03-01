@@ -4,6 +4,7 @@
    WELLINGTON WTECH BRASIL
 
    MÓDULO ALIMENTADO POR UM REGULADOR AMS1117 DE 3.3V 
+   Necessário adicionar também dois resistores de pullup 4k7 das linhas data e clock aos 5v.
 
          2 4 6 8 10 12   CONECTOR DO 
         1 3 5 7 9 11 13   MÓDULO RF 
